@@ -2,12 +2,13 @@ import os
 import warnings
 
 from langchain_community.llms import OpenAI
+from keys.key import open_ai_key
 from langchain.prompts import PromptTemplate
 import re
 
 warnings.filterwarnings('ignore')
 
-os.environ['OPENAI_API_KEY'] = os.environ['open_ai_key']
+os.environ['OPENAI_API_KEY'] = open_ai_key
 
 
 def chat_bot(input):
@@ -48,7 +49,7 @@ if __name__ == '__main__':
       break
     inp = f'''Human : {inp}'''
     final_inp = get_fun(inp)
-    print(final_inp)
+    # print(final_inp)
     response = chat_bot(final_inp)
     response=response.strip()
 
