@@ -1,66 +1,46 @@
+from fastapi import FastAPI,WebSocket,WebSocketDisconnect
 import os
-import warnings
-
-from langchain_community.llms import OpenAI
 from keys.key import open_ai_key
-from langchain.prompts import PromptTemplate
-import re
+import warnings
+from pydantic import BaseModel
+from services.openai import OpenAIService
+
+
+class BotMessage(BaseModel):
+    message : str 
+    id : int | None = None
+
 
 warnings.filterwarnings('ignore')
 
 os.environ['OPENAI_API_KEY'] = open_ai_key
+app = FastAPI()
+
+open_ai = OpenAIService(temp=0.6)
 
 
-def chat_bot(input):
-  llm = OpenAI(temperature=0.6)
-  prompt_template = PromptTemplate(
-    input_variables=["input"],
-    template='''
-        {input}
-    '''
-    
-  )
-  
-  answer = llm(prompt_template.format(input=input))
-  return answer
+@app.websocket("/ws")
+async def websocket_endpoint(websocket:WebSocket):
+    await websocket.accept()
+
+    try:
+        while True:
+            data = await websocket.receive_text()
+            response = open_ai.get_reponse(data)
+            await websocket.send_text(f"AI : {response}")
+    except WebSocketDisconnect:
+        print("Socket closed")
 
 
-prev_chat = []
+@app.post("/bot")
+async def root(bot_message : BotMessage):
 
-
-def get_fun(inp):
-  result = ''''''
-  if len(prev_chat)<9:
-    for i in range(len(prev_chat)):
-      result+=prev_chat[i]['chat']
-    result+=inp
-  else:
-    for i in range(len(prev_chat)-9,len(prev_chat)):
-      result+=prev_chat[i]['chat']
-    result+=inp
-  return result
-    
-    
-if __name__ == '__main__':
-  print("Hii ! I am you assistance how can i help you ?")
-  while True:
-    inp = input("You : ")
-    if(inp=='exit'):
-      break
-    inp = f'''Human : {inp}'''
-    final_inp = get_fun(inp)
-    # print(final_inp)
-    response = chat_bot(final_inp)
-    response=response.strip()
-
-    res = {
-      "chat" : f'''{inp}
-{response}
-      '''
+    response = open_ai.get_reponse(bot_message.message)
+    ctx = {
+        'human':bot_message.message,
+        'ai':response
     }
-    prev_chat.append(res)
+    return ctx
 
-    
-    print(f'''{response.split(":")[1].strip()}
-    ''',end='\n')
-    
+if __name__=='__main__':
+    app.run()
