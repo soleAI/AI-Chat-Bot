@@ -16,9 +16,16 @@ function App() {
     setLoading(true);
     setMsg("");
   };
+
   useEffect(() => {
     ws.onmessage = async function (event) {
-      console.log(event.data);
+      let parts = event.data.split(":");
+      let toSpeak = parts.slice(1).join(":");
+      const value: SpeechSynthesisUtterance = new SpeechSynthesisUtterance(
+        toSpeak
+      );
+      window.speechSynthesis.speak(value);
+
       await setAllMsg((prevAllMsg) => [...prevAllMsg, event.data]);
       setLoading(false);
     };
@@ -118,7 +125,12 @@ function App() {
             onChange={(e) => {
               setMsg(e.target.value);
             }}
-            style={{ height: "150px", width: "90%" }}
+            style={{
+              height: "150px",
+              width: "90%",
+              outline: "none",
+              fontSize: "15px",
+            }}
           />
           <div
             style={{
@@ -140,7 +152,13 @@ function App() {
                 borderRadius: "30px",
               }}
             >
-              {recording ? "recording...." : "Click to record"}
+              {recording ? (
+                "Listening"
+              ) : (
+                <>
+                  <i className="fa-solid fa-microphone"></i>
+                </>
+              )}
             </button>
             <button
               onClick={submitHandler}
