@@ -1,9 +1,37 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./App.css";
+import { v4 as uuid } from "uuid";
 
-const ws: WebSocket = new WebSocket("ws://127.0.0.1:8000/ws");
+const client_id: string = uuid();
+const ws: WebSocket = new WebSocket(`ws://127.0.0.1:8000/ws/${client_id}`);
 type AllMsgType = string[];
 
+interface TextPrinterProps {
+  text: string;
+}
+
+const TextPrinter: React.FC<TextPrinterProps> = ({ text }) => {
+  const [printedText, setPrintedText] = useState<String>("");
+
+  useEffect(() => {
+    console.log(text);
+    const words = text.split(" ");
+    console.log(words);
+
+    let currentIndex = 0;
+    const intervalId = setInterval(() => {
+      setPrintedText((prevText) => prevText + " " + words[currentIndex]);
+      currentIndex += 1;
+      if (currentIndex === words.length - 1) {
+        clearInterval(intervalId);
+      }
+    }, 300); // Adjust the delay (in milliseconds) as needed
+
+    return () => clearInterval(intervalId); // Cleanup on component unmount
+  }, [text]);
+
+  return <div>{printedText}</div>;
+};
 function App() {
   const [msg, setMsg] = useState("");
   const [allMsg, setAllMsg] = useState<AllMsgType>([]);
@@ -50,6 +78,7 @@ function App() {
       recognition.onresult = async function (event: any) {
         const result = event.results[event.resultIndex];
         const transcript = result[0].transcript;
+
         await setMsg(transcript); // Update the state with the recognized speech
       };
 
@@ -91,17 +120,23 @@ function App() {
         }}
       >
         <div style={{ width: "100%" }}>
-          {allMsg.map((data: String, index: number) => {
+          {allMsg.map((data: string, index: number) => {
             return (
               <pre
                 style={{
                   width: "80%",
                   whiteSpace: "pre-wrap",
-                  color: `${index % 2 == 0 ? "black" : "gray"}`,
+                  color: `${index % 2 === 0 ? "black" : "gray"}`,
                 }}
                 key={index}
               >
-                {data}
+                {index % 2 === 1 ? (
+                  <>
+                    <TextPrinter text={data} />{" "}
+                  </>
+                ) : (
+                  <>{data}</>
+                )}
               </pre>
             );
           })}
