@@ -17,3 +17,4 @@
        open_ai_key="your openai secret key"
    ```
 6. Now run the application by using cmd : `uvicorn main:app --reload`
+7. the backend will run on `8000` port now.
