@@ -14,21 +14,28 @@ class Temp(BaseModel):
 class OpenAIService:
     def __init__(self,temp:int) -> None:
         self.llm = OpenAI(temperature=temp)
-        self.prev_chat:{str:list[Temp]} = {}
+        self.prev_chat = {}
     
     def get_fun(self,inp:str,client_id:str):
-        result:str = ''''''
+        result:str = '''
+        Below are the previous chat between AI i.e GPT and human
+        '''
         if len(self.prev_chat[client_id])<9:
             for i in range(len(self.prev_chat[client_id])):
                 result += self.prev_chat[client_id][i].query
+            
+            result+='This is the new question from human based on previous chat history.\n'
             result += inp
         else:
             for i in range(len(self.prev_chat[client_id])-9,len(self.prev_chat[client_id])):
                 result+=self.prev_chat[client_id][i].query
+            result+='This is the new question from human based on previous chat history.\n'
             result+=inp
         return result
 
     def get_reponse(self,input:str,client_id:str)->str:
+        if input=="":
+            return "AI : Please Provide a valid input"
         prompt_template = PromptTemplate(
             input_variables=["input"],
             template='''
