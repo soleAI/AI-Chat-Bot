@@ -1,22 +1,23 @@
 from pydantic import BaseModel,Field
-from typing import Optional
+
 
 class User(BaseModel):
     email : str
     name : str 
-    mobile_num: Optional[str]
+    mobile_num: str
     password:str
     onobarding_step:int = Field(default=1)
-    verified:bool = Field(default=False)
+    onboarded:bool = Field(default=False)
+    disabled:bool = Field(default=False)
 
 def serial(user) -> dict:
     return {
         "id":str(user['_id']),
         "name":user['name'],
         'email':user['email'],
-        'password':user['password'],
+        'mobile_num':user['mobile_num'],
         'onboarding_step':user['onobarding_step'],
-        'verified':user['verified']
+        'onboarded':user['onboarded']
     }
 
 def list_serial(users)->list:
