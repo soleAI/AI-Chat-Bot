@@ -7,11 +7,12 @@ from datetime import datetime, timedelta, timezone
 from config.database import user_collection
 from jose import JWTError, jwt
 import bcrypt
+import os
 
 router = APIRouter(prefix='/auth')
 
-SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-ALGORITHM = "HS256"
+SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7" or os.getenv('JWT_SECRET_KEY')
+ALGORITHM = "HS256" or os.getenv('JWT_ALGORITHM')
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
@@ -56,7 +57,7 @@ async def sign_up(user:UserSignUp):
     inserted_id = insert_result.inserted_id
     inserted_user = user_collection.find_one({'_id': inserted_id})
     inserted_user =  serial(inserted_user)
-    
+
     access_token = create_access_token(data={'email':inserted_user['email'],'id':inserted_user['id']},expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
     return ResponseWithToken(user=inserted_user,access_token=access_token, token_type="bearer")
 
