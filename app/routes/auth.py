@@ -1,69 +1,40 @@
-from app import app
-from fastapi import APIRouter,HTTPException
+from fastapi import APIRouter,HTTPException,Response,Depends
 from schemas.auth_routes import UserSignUp,UserLogin,ResponseWithToken
 from models.user import (User,serial)
-from pydantic import BaseModel
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from config.database import user_collection
-from jose import JWTError, jwt
-import bcrypt
-import os
+from middlewares.auth import (jwt_instance,verify_auth,Bcrypts)
 
 router = APIRouter(prefix='/auth')
 
-SECRET_KEY =  os.getenv('JWT_SECRET_KEY') or "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7" 
-ALGORITHM =  os.getenv('JWT_ALGORITHM') or "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-
-
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
-
-class Bcrypts:
-    @staticmethod
-    def get_hash(password:str)->str:
-        bytes = password.encode('utf-8') 
-        salt = bcrypt.gensalt() 
-        hash = bcrypt.hashpw(bytes, salt) 
-        return hash
-    
-    @staticmethod
-    def compare(password,hashed_password)->bool:
-        return  bcrypt.checkpw(password.encode('utf-8'),hashed_password.encode('utf-8'))
-
-
 @router.post("/sign-up")
-async def sign_up(user:UserSignUp):
+async def sign_up(user:UserSignUp,response:Response):
     '''
         This function is responsible for signing up a user with email and password
     '''
-
     hashed_password : str = Bcrypts.get_hash(user.password)
-    new_user:User = User(name=user.name, email=user.email, password=hashed_password, mobile_num=user.mobile_num,created_datetime=datetime.utcnow(),updated_datetime=datetime.utcnow())
+    new_user:User = User(name=user.name, email=user.email, password=hashed_password,mobile_num=user.mobile_num,created_datetime=datetime.utcnow(),updated_datetime=datetime.utcnow())
     existing_user = user_collection.find_one({'$or':[{'email':new_user.email},{'mobile_num':new_user.mobile_num}]})
+
     if existing_user:
-        raise HTTPException(status_code=403,detail='User Already Exist')
+        raise HTTPException(status_code=403,detail='User Already Exist with same mobile/email')
     
     insert_result = user_collection.insert_one(dict(new_user))
     inserted_id = insert_result.inserted_id
     inserted_user = user_collection.find_one({'_id': inserted_id})
     inserted_user =  serial(inserted_user)
 
-    access_token = create_access_token(data={'email':inserted_user['email'],'id':inserted_user['id']},expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    access_token = jwt_instance.create_access_token(data={'email':inserted_user['email'],'id':inserted_user['id']})
+    refresh_token = jwt_instance.create_refresh_token(data={'email':inserted_user['email'],'id':inserted_user['id']})
+
+    response.set_cookie(key='access_token',value=f'Bearer {access_token}',httponly=True)
+    response.set_cookie(key='refresh_token',value=f'Bearer {refresh_token}',httponly=True)
+    
     return ResponseWithToken(user=inserted_user,access_token=access_token, token_type="bearer")
 
 
 @router.post("/sign-in")
-async def sign_in(user:UserLogin):
+async def sign_in(user:UserLogin,response:Response):
     '''
         This function is responsible for signing in a user with email and password
     '''
@@ -71,14 +42,30 @@ async def sign_in(user:UserLogin):
     db_user = user_collection.find_one({'email':user.email})
     if not db_user:
         raise HTTPException(status_code=404,detail='Enter valid credentials')
+    if db_user['disabled']==True:
+        raise HTTPException(status_code=403,detail='User is disabled')
+    
     hashed_password = db_user['password']
     db_user = serial(db_user)
     if Bcrypts.compare(user.password,hashed_password)==False:
         raise HTTPException(status_code=404,detail='Enter valid credentials')
     
-    access_token = create_access_token(data={'email':db_user['email'],'id':db_user['id']},expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    access_token = jwt_instance.create_access_token(data={'email':db_user['email'],'id':db_user['id']})
+    refresh_token =jwt_instance.create_refresh_token(data={'email':db_user['email'],'id':db_user['id']})
+    
+    response.set_cookie(key='access_token',value=f'Bearer {access_token}',httponly=True)
+    response.set_cookie(key='refresh_token',value=f'Bearer {refresh_token}',httponly=True)
     return ResponseWithToken(user=db_user,access_token=access_token, token_type="bearer")
 
+
+
+@router.get("/get_me")
+async def get_me(logged_in_user: dict = Depends(verify_auth(roles_allowed=[]))):
+    '''
+        This function will return the current logged in user
+    '''
+    user = logged_in_user
+    return user
     
 
 
