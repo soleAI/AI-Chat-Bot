@@ -1,5 +1,10 @@
 from pydantic import BaseModel,Field
 from datetime import datetime
+from enum import Enum
+
+class UserRole(Enum):
+    USER = "user"
+    ADMIN = "admin"
 
 class User(BaseModel):
     email : str
@@ -11,6 +16,8 @@ class User(BaseModel):
     disabled:bool = Field(default=False)
     created_datetime: datetime 
     updated_datetime : datetime = Field(default_factory=datetime.utcnow)
+    role:UserRole = UserRole.USER
+     
 
 def serial(user) -> dict:
     return {
@@ -21,7 +28,8 @@ def serial(user) -> dict:
         'onboarding_step':user['onobarding_step'],
         'onboarded':user['onboarded'],
         'created_datetime':user['created_datetime'],
-        'updated_datetime':user['updated_datetime']
+        'updated_datetime':user['updated_datetime'],
+        'role':user['role']
     }
 
 def list_serial(users)->list:

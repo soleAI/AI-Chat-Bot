@@ -6,6 +6,7 @@ from jose import JWTError, jwt
 import os
 from bson import ObjectId
 import bcrypt
+from models.user import UserRole
 
 
 
@@ -90,7 +91,7 @@ def get_user_detail_from_user_id(user_id:str) -> dict:
     return serialized_user
 
 
-def verify_auth(roles_allowed: list[str]):
+def verify_auth(roles_allowed: list[UserRole]):
     
     async def _verify_auth(request: Request, response: Response):
         authorization = request.cookies.get("access_token")
@@ -102,6 +103,14 @@ def verify_auth(roles_allowed: list[str]):
             response.set_cookie(key='access_token', value=f'Bearer {new_access_token}', httponly=True)
 
         logged_in_user = get_user_detail_from_user_id(user_id=user_id)
+        
+        roles_allowed_str = []
+        for i in range(len(roles_allowed)):
+            roles_allowed_str.append(roles_allowed[i].value)
+
+        if logged_in_user['role'] not in roles_allowed_str:
+            raise HTTPException(status_code=401,detail="Unauthorized")
+        
         return logged_in_user
     
     return _verify_auth

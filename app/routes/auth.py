@@ -4,8 +4,15 @@ from models.user import (User,serial)
 from datetime import datetime
 from config.database import user_collection
 from middlewares.auth import (jwt_instance,verify_auth,Bcrypts)
+from models.user import UserRole
 
 router = APIRouter(prefix='/auth')
+
+def convert_enum_to_str(user):
+    user_dict = user.dict()
+    user_dict["role"] = user_dict["role"].value
+    return user_dict
+
 
 @router.post("/sign-up")
 async def sign_up(user:UserSignUp,response:Response):
@@ -18,8 +25,8 @@ async def sign_up(user:UserSignUp,response:Response):
 
     if existing_user:
         raise HTTPException(status_code=403,detail='User Already Exist with same mobile/email')
-    
-    insert_result = user_collection.insert_one(dict(new_user))
+    new_user = convert_enum_to_str(new_user)
+    insert_result = user_collection.insert_one(new_user)
     inserted_id = insert_result.inserted_id
     inserted_user = user_collection.find_one({'_id': inserted_id})
     inserted_user =  serial(inserted_user)
@@ -60,10 +67,11 @@ async def sign_in(user:UserLogin,response:Response):
 
 
 @router.get("/get_me")
-async def get_me(logged_in_user: dict = Depends(verify_auth(roles_allowed=[]))):
+async def get_me(logged_in_user: dict = Depends(verify_auth(roles_allowed=[UserRole.USER]))):
     '''
         This function will return the current logged in user
     '''
+    print(id)
     user = logged_in_user
     return user
     
