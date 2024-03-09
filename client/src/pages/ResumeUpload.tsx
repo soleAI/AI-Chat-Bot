@@ -50,7 +50,7 @@ const ResumeUpload = () => {
         setTake(true);
     }
     return (
-        <Card sx={{ display: 'flex', gap: "20px", flexDirection: "column", justifyContent: 'center', alignItems: 'center', width: '100vw', height: '100vh', bgcolor: "#f6f9fc" }}>
+        <Card sx={{ display: 'flex', gap: "20px", flexDirection: "column", justifyContent: 'center', alignItems: 'center', width: '98vw', height: '98vh', bgcolor: "#f6f9fc" }}>
 
 
             <Card ref={wrapperRef}

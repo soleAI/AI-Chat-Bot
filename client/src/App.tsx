@@ -3,6 +3,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles';
 import LoginPage from './pages/loginPage';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import SignUpPage from './pages/signUpPage';
+import ResumeUpload from './pages/ResumeUpload';
 
 
 const App = () => {
@@ -22,6 +23,7 @@ const App = () => {
       <Routes>
         <Route path='/' element={<LoginPage/>}/>
         <Route path='/signup' element={<SignUpPage/>}/>
+        <Route path='/resumeUpload' element={<ResumeUpload/>}/>
       </Routes>
       </BrowserRouter>
     </ThemeProvider>
