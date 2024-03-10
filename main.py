@@ -2,7 +2,7 @@
 from app import app
 from websocket import endpoints
 import warnings
-from app.routes import auth
+from app.routes import auth,onboarding
 from fastapi.middleware.cors import CORSMiddleware
 
 origins = [
@@ -19,7 +19,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router,prefix='/api/v1')
+app.include_router(auth.router,prefix='/api/v1/auth')
+app.include_router(onboarding.router,prefix='/api/v1/onboarding')
 
 warnings.filterwarnings('ignore')
 
