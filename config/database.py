@@ -7,3 +7,4 @@ client = MongoClient(URI)
 db = client.sole_ai_db
 
 user_collection = db['users']
+file_collection = db['files']

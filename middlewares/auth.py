@@ -95,6 +95,8 @@ def verify_auth(roles_allowed: list[UserRole]):
     
     async def _verify_auth(request: Request, response: Response):
         authorization = request.cookies.get("access_token")
+        if authorization is None:
+            raise HTTPException(status_code=401,detail="Unauthorized")
         access_token = authorization.split(" ")[1]
         refresh_token = request.cookies.get('refresh_token').split(" ")[1]
         status, user_id = jwt_instance.verify_access_token(access_token)

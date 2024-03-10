@@ -6,7 +6,7 @@ from config.database import user_collection
 from middlewares.auth import (jwt_instance,verify_auth,Bcrypts)
 from models.user import UserRole
 
-router = APIRouter(prefix='/auth')
+router = APIRouter()
 
 def convert_enum_to_str(user):
     user_dict = user.dict()
@@ -71,7 +71,6 @@ async def get_me(logged_in_user: dict = Depends(verify_auth(roles_allowed=[UserR
     '''
         This function will return the current logged in user
     '''
-    print(id)
     user = logged_in_user
     return user
     
