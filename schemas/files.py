@@ -17,9 +17,16 @@ class File_Upload():
         if not os.path.exists(self.root_path):
             os.makedirs(self.root_path)
         self.file = file
+        self.accepted_resume_format=['pdf','docx','doc','txt']
     
     async def upload_resume(self,uploader_id:str) -> str:
         try:
+            file_name=self.file.filename
+            extension=file_name.split(".")[-1]
+            format_str=",".join(self.accepted_resume_format)
+            
+            if extension not in self.accepted_resume_format:
+                raise HTTPException(status_code=400,detail= f"Please Upload {format_str} these formats only")
             contents = await self.file.read()
             random_string = generate_random_string(10)
             upload_path_dir = os.path.join(self.root_path, 'resume')
@@ -35,5 +42,7 @@ class File_Upload():
             inserted_id = inserted_file.inserted_id
             return str(inserted_id)
         
+        except HTTPException as e:
+           raise HTTPException(status_code=400,detail=e.detail)
         except Exception as e:
-            raise HTTPException(status_code=402,detail="File Upload Error")
+            raise HTTPException(status_code=400, detail="File Upload Error")
