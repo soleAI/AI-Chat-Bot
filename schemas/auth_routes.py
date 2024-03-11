@@ -41,7 +41,7 @@ class UserSignUp(BaseModel):
         return value
 
     @field_validator('name')
-    def validate_mobile(cls,value):
+    def validate_name(cls,value):
         '''Validating the Name'''
 
         if not re.match(name_regex,value):
