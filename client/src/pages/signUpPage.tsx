@@ -12,13 +12,14 @@ import logo from '../assets/SoleAI_Logo.png'
 
 const ContainerStyle: Object = {
   width: 1,
-  height: '98vh',
+  height: '150vh',
   display: 'flex',
   flexDirection: {xs: 'column', sm: 'column', md: 'row', lg: 'row'},
   alignItems: 'center'
 }
 const ImageStyle: Object = {
   width: {xs: 1 / 4, sm: 1 / 4, md: 1, lg: 1},
+  height: '120vh',
   visibility: {xs: 'hidden', sm: 'hidden', md: 'visible', lg: 'visible'}
 }
 const SignUpPage: React.FC = () => {
@@ -57,6 +58,15 @@ const SignUpPage: React.FC = () => {
             placeholder="enter your email"
             required
           />
+          <FormLabel>Mobile Number</FormLabel>
+          <TextField
+            id="email"
+            type="text"
+            size="small"
+            variant="outlined"
+            placeholder="enter your mobile number"
+            required
+          />
           <FormLabel>Password</FormLabel>
           <TextField
             id="password"
@@ -66,6 +76,16 @@ const SignUpPage: React.FC = () => {
             placeholder="create password"
             required
           />
+          <FormLabel>Confirm Password</FormLabel>
+          <TextField
+            id="password"
+            type="password"
+            size="small"
+            variant="outlined"
+            placeholder="enter your password"
+            required
+          />
+          
           <Button id="login-btn" variant="contained" sx={{width: 1}}>
             Sign up
           </Button>
