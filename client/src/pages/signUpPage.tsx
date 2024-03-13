@@ -42,7 +42,7 @@ const SignUpPage: React.FC = () => {
           </Typography>
           <FormLabel>Full Name</FormLabel>
           <TextField
-            id="email"
+            id="Name"
             type="text"
             size="small"
             variant="outlined"
@@ -60,8 +60,8 @@ const SignUpPage: React.FC = () => {
           />
           <FormLabel>Mobile Number</FormLabel>
           <TextField
-            id="email"
-            type="text"
+            id="mobileNumber"
+            type="number"
             size="small"
             variant="outlined"
             placeholder="enter your mobile number"
@@ -78,7 +78,7 @@ const SignUpPage: React.FC = () => {
           />
           <FormLabel>Confirm Password</FormLabel>
           <TextField
-            id="password"
+            id="confirmPassword"
             type="password"
             size="small"
             variant="outlined"
