@@ -1,28 +1,65 @@
-import {Card, Button} from '@mui/material'
+import { Card, Button, Box, Hidden } from '@mui/material'
 import React from 'react'
-import ControlPointIcon from '@mui/icons-material/ControlPoint'
-import {useRef, useState} from 'react'
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { useRef, useState } from 'react'
 
 const ContainerStyle: Object = {
   display: 'flex',
-  gap: '20px',
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-  width: '98vw',
-  height: '98vh',
-  bgcolor: '#f6f9fc'
+  height: '100vh',
+  bgcolor: '',
+  overFlow: "Hidden"
 }
-const WrapperStyle: Object = {
-  bgcolor: 'white',
-  width: '40%',
-  height: '40vh',
+const WrapCardStyle: Object = {
+  bgcolor: "#e6e6e6", padding: "1.5rem", width: {
+    xs: "90%",
+    sm: "80%",
+    md: "70%",
+    lg: "50%",
+    xl: "40%"
+  }
+}
+const HeadingStyle: Object = {
+  fontSize: '1.5rem', fontWeight: 'bold', margin: '0px'
+}
+const HeadingStyle1: Object = {
+  fontSize: '.5rem', marginBottom: '1rem'
+}
+const DropArea: Object = {
+  height: "35vh", width: "100%", bgcolor: "white", display: 'flex', justifyContent: 'center', borderRadius: "5px", border: '2px  #C0C2C9 solid', cursor: 'pointer'
+}
+const DropAreaDiv: Object = {
   display: 'flex',
+  flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-  border: '2px dashed gray'
+  gap: '0.2rem',
 }
+const DropAreaIcon: Object = {
+  fontSize: '7rem', color: 'gray'
+}
+const FileInfoText: Object = {
+  margin: '0px', cursor: 'pointer'
+}
+const FileInfoTextName: Object = {
+  overflowWrap: 'break-word', textAlign: "center", fontSize: '.3rem', width: '100%'
+}
+const ButtonDiv: Object = {
 
+  display: 'flex',
+  flexWrap: 'wrap',
+  justifyContent: 'center',
+  alignItems: 'center',
+  gap: '20px',
+  marginTop: "15px"
+
+}
+const ReviewIcon: Object = {
+  textDecoration: 'none', display: 'flex', justifyContent: "center", alignItems: 'center', padding: '0px 10px'
+}
 const ResumeUpload: React.FC = () => {
   const [file, setFile] = useState<any>()
   const wrapperRef = useRef<HTMLDivElement>(null)
@@ -58,63 +95,56 @@ const ResumeUpload: React.FC = () => {
     setFile(null)
   }
   return (
-    <Card sx={ContainerStyle}>
-      <Card
-        ref={wrapperRef}
-        sx={WrapperStyle}
-        onDragEnter={onDragEnter}
-        onDragLeave={onDragLeave}
-        onDrop={onDropFile}
-        onDragOver={onDragHandler}
-        onClick={openFileDialog}
-      >
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '3rem'
-          }}
+    <Box sx={ContainerStyle}>
+      <Card sx={WrapCardStyle}>
+
+        <p style={HeadingStyle}>Upload or attach resume </p>
+        <p style={HeadingStyle1}>Click to upload or drag and drop </p>
+
+        <Box sx={DropArea}
+          ref={wrapperRef}
+
+          onDragEnter={onDragEnter}
+          onDragLeave={onDragLeave}
+          onDrop={onDropFile}
+          onDragOver={onDragHandler}
+          onClick={openFileDialog}
         >
-          <h2>Drag and Drop an file or Click to upload</h2>
-          <ControlPointIcon sx={{fontSize: '3rem', color: 'gray'}} />
-        </div>
-        <input
-          type="file"
-          ref={fileInputRef}
-          accept=".doc,.docx,.pdf"
-          hidden
-          onChange={onFileDrop}
-        />
-      </Card>
-      <div
-        style={{
-          display: 'flex',
-          width: '40%',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}
-      >
-        <h2 style={{margin: '0px', cursor: 'pointer'}}>
-          {file && <a href={URL.createObjectURL(file)}>{file.name}</a>}
-        </h2>
+          <div
+            style={DropAreaDiv}
+          ><CloudUploadOutlinedIcon sx={DropAreaIcon} />
+            <h3 style={FileInfoText}>
+              {file ? <p style={FileInfoTextName}>{file.name}</p> : <p style={{ fontSize: '.5rem' }}>No file Selected</p>}
+            </h3>
+          </div>
+
+          <input
+            type="file"
+            ref={fileInputRef}
+            accept=".doc,.docx,.pdf"
+            hidden
+            onChange={onFileDrop}
+          />
+        </Box>
+
+
+
         <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: '5px'
-          }}
+          style={ButtonDiv}
         >
-          <Button variant="contained" onClick={removeHandler}>
+          <Button variant="contained" color={"error"} onClick={removeHandler}>
             Cancel
           </Button>
-          <Button variant="contained" disabled={!file}>
+          <Button variant="contained" color={"primary"} disabled={!file}>
             Continue
           </Button>
+          {file && <a style={ReviewIcon} href={URL.createObjectURL(file)}><VisibilityIcon sx={{ color: '#8c8e96' }}>
+          </VisibilityIcon></a>}
         </div>
-      </div>
-    </Card>
+
+
+      </Card>
+    </Box>
   )
 }
 
