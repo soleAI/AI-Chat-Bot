@@ -1,7 +1,7 @@
-import {Card, Button} from '@mui/material'
+import { Card, Button, Box } from '@mui/material'
 import React from 'react'
 import ControlPointIcon from '@mui/icons-material/ControlPoint'
-import {useRef, useState} from 'react'
+import { useRef, useState } from 'react'
 
 const ContainerStyle: Object = {
   display: 'flex',
@@ -15,6 +15,7 @@ const ContainerStyle: Object = {
 }
 const WrapperStyle: Object = {
   bgcolor: 'white',
+  padding: '10px',
   width: '40%',
   height: '40vh',
   display: 'flex',
@@ -73,11 +74,11 @@ const ResumeUpload: React.FC = () => {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '3rem'
+            gap: '1.5rem'
           }}
         >
-          <h2>Drag and Drop an file or Click to upload</h2>
-          <ControlPointIcon sx={{fontSize: '3rem', color: 'gray'}} />
+          <p style={{ textAlign: "center", fontSize: '1.2rem', padding: "1rem" }}>Drag and Drop an file or Click to upload</p>
+          <ControlPointIcon sx={{ fontSize: '2rem', color: 'gray' }} />
         </div>
         <input
           type="file"
@@ -87,17 +88,16 @@ const ResumeUpload: React.FC = () => {
           onChange={onFileDrop}
         />
       </Card>
-      <div
-        style={{
-          display: 'flex',
-          width: '40%',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}
+      <Box
+        display="flex"
+        flexDirection='column'
+        width="40%"
+        justifyContent="space-between"
+        alignItems="center"
       >
-        <h2 style={{margin: '0px', cursor: 'pointer'}}>
+        <p style={{ marginBottom: '10px', cursor: 'pointer' }}>
           {file && <a href={URL.createObjectURL(file)}>{file.name}</a>}
-        </h2>
+        </p>
         <div
           style={{
             display: 'flex',
@@ -113,8 +113,8 @@ const ResumeUpload: React.FC = () => {
             Continue
           </Button>
         </div>
-      </div>
-    </Card>
+      </Box>
+    </Card >
   )
 }
 
