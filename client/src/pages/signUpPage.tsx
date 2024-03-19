@@ -5,7 +5,7 @@ import {
   Divider,
   FormLabel,
   TextField,
-  Typography,Hidden
+  Typography, Hidden
 } from '@mui/material'
 import React, { useState } from 'react'
 import logo from '../assets/SoleAI_Logo.png'
@@ -52,6 +52,20 @@ const SignUpPage: React.FC = () => {
     mobilenumber: false,
 
   })
+
+  function isValidEmail(email: string) {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+  }
+  function isNameValid(name: string) {
+    const regex = /^[A-Za-z\s]+$/;
+    return regex.test(name);
+  }
+  function isVaidMobileNumber(mobile_number: string) {
+    const regex = /^\d{10}$/;
+    return regex.test(mobile_number);
+  }
+
   const changeHandler = (e: Event) => {
 
     if (e.target != null) {
@@ -60,6 +74,9 @@ const SignUpPage: React.FC = () => {
       setErrors({ ...error, [name]: false })
     }
   }
+
+
+
   const validateForm = (e: Event) => {
     e.preventDefault();
     const { name, email, password, confirmPassword, mobilenumber }: FormDataExt = details;
@@ -71,9 +88,12 @@ const SignUpPage: React.FC = () => {
       mobilenumber: false,
     }
     if (name === "") newErrors.name = true;
+    if (!newErrors.name && !isNameValid(name)) newErrors.name = true;
     if (email === "") newErrors.email = true;
+    if (!newErrors.email && !isValidEmail(email)) newErrors.email = true;
     if (confirmPassword === "") newErrors.confirmPassword = true;
     if (mobilenumber === "") newErrors.mobilenumber = true;
+    if (!newErrors.mobilenumber && !isVaidMobileNumber(mobilenumber)) newErrors.mobilenumber = true;
     if (password === "") newErrors.password = true;
     setErrors(newErrors);
 
@@ -103,10 +123,10 @@ const SignUpPage: React.FC = () => {
             mx: { xs: 2, sm: 15, md: 10, lg: 6 }
           }}
         > <Hidden smUp>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          <img src={logo} style={{ width: "5rem", height: "5rem" }} alt="Logo" />
-        </div>
-      </Hidden>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <img src={logo} style={{ width: "5rem", height: "5rem" }} alt="Logo" />
+            </div>
+          </Hidden>
           <Typography variant="h4" component="h2">
             Create your account
 
@@ -123,7 +143,7 @@ const SignUpPage: React.FC = () => {
             value={details.name}
             onChange={changeHandler}
             error={error.name}
-            helperText={(error.name) && "Please enter your name."}
+            helperText={(error.name) && "Please enter valid  name."}
           />
           <FormLabel>Email</FormLabel>
           <TextField
@@ -137,7 +157,7 @@ const SignUpPage: React.FC = () => {
             value={details.email}
             onChange={changeHandler}
             error={error.email}
-            helperText={(error.email) && "Please enter your valid email."}
+            helperText={(error.email) && "Please enter valid email."}
           />
           <FormLabel>Mobile Number</FormLabel>
           <TextField
@@ -152,7 +172,7 @@ const SignUpPage: React.FC = () => {
             value={details.mobilenumber}
             onChange={changeHandler}
             error={error.mobilenumber}
-            helperText={(error.mobilenumber) && "Please enter your mobilenumber."}
+            helperText={(error.mobilenumber) && "Please enter valid mobilenumber."}
           />
           <FormLabel>Password</FormLabel>
           <TextField
@@ -181,11 +201,13 @@ const SignUpPage: React.FC = () => {
             onChange={changeHandler}
             error={error.confirmPassword}
             helperText={(error.confirmPassword && "Please confirm the password")
+
             }
           />
           {(details.confirmPassword.length > 0 &&
-            details.confirmPassword !== details.password) && <p style={{ color: "red", margin: "0px", fontSize: "10px" }}>This does not match with password</p>}
-
+            details.confirmPassword !== details.password) && <p style={{ color: "red", marginTop: "0px", fontSize: "12px" }}>This do not match with password</p>}
+          {(details.confirmPassword.length > 0 &&
+            details.confirmPassword === details.password) && <p style={{ color: "#00cc00", marginTop: "0px", fontSize: "12px" }}>PassWord Matched</p>}
           <Button id="login-btn" variant="contained" sx={{ width: 1 }} onClick={validateForm}>
             Sign up
           </Button>

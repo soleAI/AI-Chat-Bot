@@ -40,6 +40,10 @@ const LoginPage: React.FC = () => {
     password: false
 
   })
+  function isValidEmail(email: string) {
+    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return regex.test(email);
+  }
   const changeHandler = (e: Event) => {
 
     if (e.target != null) {
@@ -48,20 +52,17 @@ const LoginPage: React.FC = () => {
       setErrors({ ...errors, [name]: false })
     }
   }
-  const validateForm = () => {
+  const validateForm = (e: Event) => {
+    e.preventDefault();
     const { email, password }: { email: string, password: string } = details;
     const newErrors: FormErrors = { email: false, password: false }
 
 
-    if ((!email)) {
-      newErrors.email = true;
-
-    }
+    if (email === "") newErrors.email = true;
+    if (!newErrors.email && !isValidEmail(email)) newErrors.email = true;
     if (!password) newErrors.password = true;
     setErrors(newErrors);
-    if (
-
-      details.email && details.password
+    if (!newErrors.email && details.email && details.password
     ) {
       console.log(details);
     } else {
@@ -77,11 +78,11 @@ const LoginPage: React.FC = () => {
       </Box>
       <Box width="100%">
         <Box sx={LoginFormStyle}>
-        <Hidden smUp>
-      <div style={{ display: "flex", justifyContent: "center" }}>
-        <img src={logo} style={{ width: "5rem", height: "5rem" }} alt="Logo" />
-      </div>
-    </Hidden>
+          <Hidden smUp>
+            <div style={{ display: "flex", justifyContent: "center" }}>
+              <img src={logo} style={{ width: "5rem", height: "5rem" }} alt="Logo" />
+            </div>
+          </Hidden>
           <Typography variant="h4" component="h2">
             Welcome Back...
           </Typography>
@@ -97,7 +98,7 @@ const LoginPage: React.FC = () => {
             required
             value={details.email}
             error={errors.email}
-            helperText={(errors.email) && "Please enter your email/mobile."}
+            helperText={(errors.email) && "Please enter  email/mobile."}
           />
           <FormLabel>Password</FormLabel>
           <TextField
@@ -112,7 +113,7 @@ const LoginPage: React.FC = () => {
             value={details.password}
             name="password"
             error={errors.password}
-            helperText={errors.password && "Please enter your password."}
+            helperText={errors.password && "Please enter password."}
 
           />
           <Button id="login-btn" variant="contained" sx={{ width: 1 }} onClick={validateForm}>
